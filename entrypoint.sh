@@ -291,7 +291,8 @@ xEOF
     echo "volumes:" >> ${COMPOSE_FILE}
     for VOLUME in ${LAUNCH_EXT_VOLUMES}; do
       VOLUME=$(echo "${VOLUME}" | grep -wo -E '^[^:]*')
-      echo "  - ${VOLUME}" >> ${COMPOSE_FILE}
+      echo "  ${VOLUME}:" >> ${COMPOSE_FILE}
+      echo "    external: true" >> ${COMPOSE_FILE}
     done
   fi
 fi
