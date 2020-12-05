@@ -68,7 +68,8 @@ if [ -f ${COMPOSE_FILE} ]; then
     'LAUNCH_HOSTNAME'
     'LAUNCH_ENVIRONMENTS'
     'LAUNCH_DEVICES'
-    'LAUNCH_VOLUMES'
+    'LAUNCH_VOLUMES',
+    'LAUNCH_EXT_VOLUMES'
     'LAUNCH_HOST_NETWORK'
     'LAUNCH_PORTS'
     'LAUNCH_NETWORKS'
@@ -168,9 +169,19 @@ xEOF
   fi
 
   # the volumes
-  if [ -n "${LAUNCH_VOLUMES}" ]; then
+  if [ -n "${LAUNCH_VOLUMES}" ] || [ -n "${LAUNCH_EXT_VOLUMES}" ]; then
     echo "    volumes:" >> ${COMPOSE_FILE}
+  fi
+  
+  if [ -n "${LAUNCH_VOLUMES}" ]; then
     for VOLUME in ${LAUNCH_VOLUMES}; do
+      echo "      - ${VOLUME}" >> ${COMPOSE_FILE}
+    done
+  fi
+  
+  # the external volumes
+  if [ -n "${LAUNCH_EXT_VOLUMES}" ]; then
+    for VOLUME in ${LAUNCH_EXT_VOLUMES}; do
       echo "      - ${VOLUME}" >> ${COMPOSE_FILE}
     done
   fi
@@ -273,6 +284,15 @@ xEOF
         } >> ${COMPOSE_FILE}
       done
     fi
+  fi
+  
+  # define external volumes
+  if [ -n "${LAUNCH_EXT_VOLUMES}" ]; then
+    echo "volumes:" >> ${COMPOSE_FILE}
+    for VOLUME in ${LAUNCH_EXT_VOLUMES}; do
+      VOLUME = $(echo ${$VOLUME} | grep -wo -E '^[^:]*')
+      echo "  - ${VOLUME}" >> ${COMPOSE_FILE}
+    done
   fi
 fi
 
